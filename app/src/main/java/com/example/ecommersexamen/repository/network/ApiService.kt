@@ -8,6 +8,6 @@ import retrofit2.http.Query
 interface ApiService {
 
     @GET("/demo-gapsi/search?")
-    fun Inventarios(@Query("query") query: Int?, @Header("X-IBM-Client-Id") auth : String) : Call<String>
+    fun Productos(@Query("query") query: Int?, @Header("X-IBM-Client-Id") auth : String) : Call<String>
 
 }
