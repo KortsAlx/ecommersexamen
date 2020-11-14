@@ -3,10 +3,8 @@ package com.example.ecommersexamen
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.ListAdapter
-import android.widget.ListView
-import android.widget.TextView
+import android.view.View
+import android.widget.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.ecommersexamen.model.ProductModel
@@ -19,6 +17,9 @@ import com.example.ecommersexamen.repository.database.HistorySearchDao
 import com.example.ecommersexamen.ui.HistorialAdapter
 import com.example.ecommersexamen.ui.ProductsAdapter
 import com.example.ecommersexamen.viewmodel.ProductsViewModel
+import io.reactivex.Scheduler
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener,
     SearchView.OnSuggestionListener {
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener,
     lateinit var recyclerlistsearch : RecyclerView
 
     var itemsFilter : MutableList<HistoryModel>?=null
+    var itemsNr: MutableList<HistoryModel>?=null
+
 
 
 
@@ -47,7 +50,26 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener,
 
         retrofitRecyclerView = findViewById(R.id.rViewProducts) as RecyclerView
         searchView.setOnQueryTextListener(this)
+
         searchView.setOnSuggestionListener(this)
+        searchView.setOnClickListener {
+
+
+        }
+
+        val threar = Thread{
+
+            val mDao = HistoryRoom.getInstance(this)!!.hisotrydao
+            itemsNr = mDao.getAllHistorial().toMutableList()//mDao.getAllFilters()
+
+            historyAdapter.setListItems(ArrayList(itemsNr))
+
+
+
+        }
+
+        threar.start()
+
         //adapterslits = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, )
 
         setAdapter()
@@ -76,14 +98,46 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener,
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        search(query)
 
+        val mDao = HistoryRoom.getInstance(this)!!.hisotrydao
+        val thread = Thread{
+            Single.fromCallable{
+                val histomodel = HistoryModel()
+
+                val ultimoid = mDao.getUltimaDate()
+
+                histomodel.setId(ultimoid+1)
+                histomodel.setSugerencia(query!!)
+
+                mDao.insert(histomodel)
+
+            }
+                .subscribeOn(Schedulers.io())
+                .subscribe()
+
+
+
+        }
+        thread.start()
+
+        if(recyclerlistsearch.visibility == View.GONE){
+            recyclerlistsearch.visibility == View.VISIBLE
+
+        }else{
+            recyclerlistsearch.visibility == View.GONE
+
+
+        }
+
+
+        //Log.d("onqt", " dasdasd")
         return true
 
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
         search(newText)
+        Log.d("onqt", " dasdasd change")
         return true
 
     }
@@ -94,19 +148,9 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener,
     }
 
     override fun onSuggestionClick(position: Int): Boolean {
-        val itemsearch = searchView.suggestionsAdapter.getItem(position)
-        Log.d("item", " searcch "+itemsearch)
 
-        val mDao = HistoryRoom.getInstance(applicationContext)!!.hisotrydao
-        val itemshistory = mDao.getAllHistorial().toMutableList()
-
-        historyAdapter.setListItems(ArrayList(itemshistory))
 
         //searchView.setQuery(itemshistory.toString(), false)
-
-        Log.d("onSclick", " click"+itemshistory)
-
-
 
         return false
 
@@ -135,10 +179,14 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener,
         }
 
     }
+    fun searchLiveData(s: String?){
+        Toast.makeText(this, " datos busqueda de "+s, Toast.LENGTH_LONG).show()
+    }
 
     lateinit var productAdapter : ProductsAdapter
     lateinit var historyAdapter : HistorialAdapter
     private fun setAdapter(){
+
         productAdapter = ProductsAdapter()
         historyAdapter = HistorialAdapter()
         retrofitRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -146,6 +194,8 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener,
 
         recyclerlistsearch.layoutManager = LinearLayoutManager(this)
         recyclerlistsearch.adapter = historyAdapter
+
+        //historyAdapter.setListItems(ArrayList(itemsNr))
 
 
 

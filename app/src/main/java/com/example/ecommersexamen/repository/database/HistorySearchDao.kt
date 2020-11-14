@@ -26,5 +26,7 @@ interface HistorySearchDao {
     @Query("SELECT *FROM historial WHERE sugerencia = :sugerencia")
     fun getAllHistorialSug(sugerencia:String): LiveData<List<HistoryModel>>
 
+    @Query("SELECT id FROM historial ORDER BY id DESC LIMIT 1")
+    fun getUltimaDate(): String
 
 }

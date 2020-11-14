@@ -1,8 +1,11 @@
 package com.example.ecommersexamen.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -11,9 +14,11 @@ import com.bumptech.glide.load.resource.bitmap.TransformationUtils.centerCrop
 import com.example.ecommersexamen.R
 import com.example.ecommersexamen.model.ProductModel
 
-class ProductsAdapter(): RecyclerView.Adapter<ProductsAdapter.ViewHolderProducts>() {
+class ProductsAdapter(): RecyclerView.Adapter<ProductsAdapter.ViewHolderProducts>(), Filterable {
 
     var productsList : ArrayList<ProductModel>?=null
+    var itemsFilter : MutableList<ProductModel> ?=null
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderProducts {
         val view = LayoutInflater.from(parent.context)
@@ -58,6 +63,36 @@ class ProductsAdapter(): RecyclerView.Adapter<ProductsAdapter.ViewHolderProducts
             txPrice = view.findViewById(R.id.precio_data)
             txTitle = view.findViewById(R.id.title_data)
             image = view.findViewById(R.id.iViewProduct)
+        }
+    }
+    fun search(s:String?,itemsFilter: MutableList<ProductModel>?, onNothingFound: (() -> Unit)?){
+        Log.d("TAG", " items filter"+itemsFilter)
+        this.itemsFilter= itemsFilter
+
+        filter.filter(s)
+
+
+    }
+
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            val filters = FilterResults()
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                productsList!!.clear()
+
+                productsList!!.addAll(itemsFilter!!.toMutableList())
+
+                return filters.also {
+                    it.values = productsList
+                }
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+
+                notifyDataSetChanged()
+
+            }
         }
     }
 }

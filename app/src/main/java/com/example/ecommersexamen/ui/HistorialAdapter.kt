@@ -1,5 +1,6 @@
 package com.example.ecommersexamen.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ecommersexamen.MainActivity
 import com.example.ecommersexamen.R
 import com.example.ecommersexamen.model.HistoryModel
 import com.example.ecommersexamen.model.ProductModel
@@ -15,6 +17,8 @@ class HistorialAdapter() : RecyclerView.Adapter<HistorialAdapter.ViewHolderHisto
     Filterable {
 
     var historyList : ArrayList<HistoryModel>?=null
+    var itemsFilter : MutableList<HistoryModel> ?=null
+
 
     class ViewHolderHistorial(view: View): RecyclerView.ViewHolder(view){
 
@@ -31,7 +35,7 @@ class HistorialAdapter() : RecyclerView.Adapter<HistorialAdapter.ViewHolderHisto
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderHistorial {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderHistorial  {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.row_hist, parent, false)
 
@@ -48,11 +52,19 @@ class HistorialAdapter() : RecyclerView.Adapter<HistorialAdapter.ViewHolderHisto
 
     override fun onBindViewHolder(holder: ViewHolderHistorial, position: Int) {
         holder!!.textHistorial.text = historyList!!.get(position).getSugerencia()
+        holder!!.itemView.setOnClickListener {
+            Log.d("clieck", " click")
+            (holder.itemView.context as MainActivity).searchLiveData(historyList!!.get(position).getSugerencia())
+
+
+
+        }
 
     }
 
     fun search(s:String?, itemfilter:MutableList<HistoryModel>?, onNothingFound: (() -> Unit)?){
 
+        this.itemsFilter = itemfilter
         filter.filter(s)
     }
 
@@ -63,6 +75,8 @@ class HistorialAdapter() : RecyclerView.Adapter<HistorialAdapter.ViewHolderHisto
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 historyList!!.clear()
 
+                historyList!!.addAll(itemsFilter!!.toMutableList())
+
                 return filters.also {
                     it.values = historyList
                 }
@@ -71,7 +85,6 @@ class HistorialAdapter() : RecyclerView.Adapter<HistorialAdapter.ViewHolderHisto
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 if (historyList.isNullOrEmpty())
-
                 notifyDataSetChanged()
             }
 

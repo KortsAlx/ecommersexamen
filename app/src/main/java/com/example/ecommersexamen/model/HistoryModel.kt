@@ -13,7 +13,7 @@ class HistoryModel {
     @NonNull
     @ColumnInfo(name = "id")
     @SerializedName("id")
-    private var id : String? =null
+    private var id : String ="0"
 
     @ColumnInfo(name = "sugerencia")
     @SerializedName("sugerencia")
