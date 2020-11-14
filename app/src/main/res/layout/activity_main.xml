@@ -12,18 +12,18 @@
         android:layout_height="60dp"
         android:actionViewClass="androidx.appcompat.widget.SearchView"
         android:backgroundTint="@color/colorPrimary"
-        android:inputType="textCapCharacters"
         android:outlineAmbientShadowColor="@color/colorAccent"
         android:outlineSpotShadowColor="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/txViewrr"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewHistorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:divider="@color/colorwhite"
+        android:dividerHeight="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searhVw" />
@@ -35,7 +35,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txViewrr" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewHistorial" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
